@@ -13,6 +13,7 @@
         <a class="brand" href="/campers">Camper Rental</a>
         <ul class="nav-links">
           <% if (currentUser) { %>
+            <li><a href="/dashboard">Dashboard</a></li>
             <li><a href="/campers/new">List Your Camper</a></li>
             <li class="user-email">Logged in as <%= currentUser.email %></li>
             <li>
