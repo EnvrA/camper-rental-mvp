@@ -1,0 +1,40 @@
+<!-- Camper details page -->
+<div class="camper-detail">
+  <% if (camper.image) { %>
+    <img src="<%= camper.image %>" alt="<%= camper.title %>" class="camper-detail-image" />
+  <% } %>
+  <div class="camper-detail-info">
+    <h1><%= camper.title %></h1>
+    <p class="price">€<%= camper.pricePerDay %> per day</p>
+    <p><%= camper.description %></p>
+    <h3>Owner</h3>
+    <p><%= camper.owner ? camper.owner.email : 'Unknown' %></p>
+
+    <h3>Bookings</h3>
+    <% if (camper.bookings.length === 0) { %>
+      <p>No bookings yet.</p>
+    <% } else { %>
+      <ul class="booking-list">
+        <% camper.bookings.forEach(b => { %>
+          <li>
+            <%= new Date(b.startDate).toLocaleDateString() %> – <%= new Date(b.endDate).toLocaleDateString() %>
+            <% if (currentUser && b.user && String(b.user) === String(currentUser._id)) { %> (your booking)<% } %>
+          </li>
+        <% }); %>
+      </ul>
+    <% } %>
+
+    <% if (currentUser) { %>
+      <h3>Book this camper</h3>
+      <form action="/campers/<%= camper._id %>/book" method="POST" class="form">
+        <label for="startDate">Start date</label>
+        <input type="date" name="startDate" id="startDate" required />
+        <label for="endDate">End date</label>
+        <input type="date" name="endDate" id="endDate" required />
+        <button type="submit" class="button">Book now</button>
+      </form>
+    <% } else { %>
+      <p><a href="/login">Login</a> to book this camper.</p>
+    <% } %>
+  </div>
+</div>
