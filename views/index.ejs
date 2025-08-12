@@ -1,8 +1,20 @@
 <!-- All Campers page -->
 <h1>Available Campers</h1>
+
+<form method="GET" action="/campers">
+  <input type="text" name="q" placeholder="Search by title..." />
+  <input type="number" name="minPrice" placeholder="Min price" min="0" />
+  <input type="number" name="maxPrice" placeholder="Max price" min="0" />
+  <button type="submit">Search</button>
+</form>
+
 <div class="card-grid">
   <% if (campers.length === 0) { %>
-    <p>No campers listed yet. <% if (currentUser) { %>Why not <a href="/campers/new">list yours</a>?<% } %></p>
+    <p>No campers listed yet.
+      <% if (currentUser) { %>
+        <a href="/campers/new">List yours</a>
+      <% } %>
+    </p>
   <% } %>
   <% campers.forEach(camper => { %>
     <div class="card">
@@ -10,8 +22,8 @@
         <img src="<%= camper.image %>" alt="<%= camper.title %>" class="camper-image" />
       <% } %>
       <h2><%= camper.title %></h2>
-      <p class="price">€<%= camper.pricePerDay %> per day</p>
-      <p><%= camper.description.slice(0, 100) %><% if (camper.description.length > 100) { %>...<% } %></p>
+      <p class="price">$<%= camper.pricePerDay %> per day</p>
+      <p><%= camper.description.length > 100 ? camper.description.slice(0, 100) + '...' : camper.description %></p>
       <a href="/campers/<%= camper._id %>" class="button">View</a>
     </div>
   <% }); %>
