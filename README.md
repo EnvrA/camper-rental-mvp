@@ -6,8 +6,12 @@ This repository contains a minimal full‑stack web application for renting and 
 
 * **User registration and login** using sessions and password hashing.
 * **List your camper** with a title, description, daily price and uploaded photo.
-* **Browse campers** available to rent.
-* **Book a camper** for a range of dates.  Existing bookings are checked to prevent date overlaps.
+* **Browse campers** and **search/filter** them by title and price range.
+* **Book a camper** for a range of dates. Existing bookings are checked to prevent date overlaps.
+* **Edit or delete your listing** if you are the owner of a camper.
+* **User dashboard** to view all of your current and past bookings.
+* **REST API endpoints** to retrieve camper data as JSON (`/api/campers` and `/api/campers/:id`).
+* **Basic security hardening** using Helmet.
 * **Simple, responsive UI** built with EJS templates and a small stylesheet.
 
 ## Getting started
@@ -19,6 +23,8 @@ This repository contains a minimal full‑stack web application for renting and 
    ```
 
 2. **Configure environment variables** by copying `.env.example` to `.env` and filling in a MongoDB URI and a session secret.
+
+   You can also set optional variables for Stripe or other integrations if you extend the app.
 
 3. **Start the development server**:
 
@@ -43,10 +49,12 @@ camper-rental-mvp/
 │   ├── layouts/
 │   │   └── layout.ejs
 │   ├── index.ejs
+│   ├── dashboard.ejs
 │   ├── login.ejs
 │   ├── signup.ejs
 │   ├── campers/
 │   │   ├── new.ejs
+│   │   ├── edit.ejs
 │   │   └── show.ejs
 ├── public/
 │   ├── styles.css    # Basic styling

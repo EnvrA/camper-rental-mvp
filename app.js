@@ -6,10 +6,10 @@ const session = require('express-session');
 const mongoose = require('mongoose');
 const MongoStore = require('connect-mongo');
 const multer = require('multer');
+const helmet = require('helmet');
 
 // Load models
 const User = require('./models/User');
-const helmet = require('helmet');
 const Camper = require('./models/Camper');
 
 const app = express();
@@ -28,6 +28,8 @@ app.use(expressLayouts);
 app.set('layout', 'layouts/layout');
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
+
+// Use helmet to set a few common security headers
 app.use(helmet());
 
 // Session configuration
@@ -113,24 +115,32 @@ app.post('/login', async (req, res) => {
 
 app.post('/logout', (req, res) => {
   req.session.destroy();
-  r/*es.redirect('/login');
-});-old
-, next
+  res.redirect('/login');
+});
+
 // Camper listing
+// Camper listing with optional search and price filtering
 app.get('/campers', async (req, res) => {
-  const campers = await Camper.find();
-*/  res.render('index', { campers, title: 'All Campers' });
-})  const { q, minPrice, maxPrice } = req.query;
-  const filt-older = {};
-  if (q) {
-    filter.title = new RegExp(q, 'i');
+  try {
+    const { q, minPrice, maxPrice } = req.query;
+    const filter = {};
+    if (q) {
+      // Case-insensitive search on title
+      filter.title = new RegExp(q, 'i');
+    }
+    if (minPrice) {
+      filter.pricePerDay = Object.assign({}, filter.pricePerDay, { $gte: parseFloat(minPrice) });
+    }
+    if (maxPrice) {
+      filter.pricePerDay = Object.assign({}, filter.pricePerDay, { $lte: parseFloat(maxPrice) });
+    }
+    const campers = await Camper.find(filter);
+    res.render('index', { campers, q, minPrice, maxPrice, title: 'All Campers' });
+  } catch (err) {
+    console.error(err);
+    res.render('index', { campers: [], error: 'Error fetching campers', title: 'All Campers' });
   }
-  if (minPrice || maxPrice) {
-    filter.pricePerDay = {};
-    if (minPrice) filter.pricePerDay.$gte = Number(minPrice);
-    if (maxPrice) filter.pricePerDay.$lte = Number(maxPrice);
-  }
-;
+});
 
 // New camper form
 app.get('/campers/new', requireLogin, (req, res) => {
@@ -192,34 +202,13 @@ app.post('/campers/:id/book', requireLogin, async (req, res) => {
   res.render('campers/show', { camper, error: null, success: 'Booking created!', title: camper.title });
 });
 
-//
-// Improved camper listing with search and price filters
-app.get('/campers', async (req, res) => {
-  try {
-    const { q, minPrice, maxPrice } = req.query;
-    const filter = {};
-    if (q) {
-      filter.title = new RegExp(q, 'i');
-    }
-    if (minPrice || maxPrice) {
-      filter.pricePerDay = {};
-      if (minPrice) filter.pricePerDay.$gte = Number(minPrice);
-      if (maxPrice) filter.pricePerDay.$lte = Number(maxPrice);
-    }
-    const campers = await Camper.find(filter);
-    res.render('index', { campers, q, minPrice, maxPrice, title: 'All Campers' });
-  } catch (err) {
-    console.error(err);
-    res.render('index', { campers: [], error: 'Error fetching campers', title: 'All Campers' });
-  }
-});
-
 // Edit camper form
 app.get('/campers/:id/edit', requireLogin, async (req, res) => {
   const camper = await Camper.findById(req.params.id);
   if (!camper) {
     return res.redirect('/campers');
   }
+  // Only owners can edit their camper
   if (String(camper.owner) !== String(req.session.userId)) {
     return res.redirect('/campers/' + camper._id);
   }
@@ -261,6 +250,7 @@ app.post('/campers/:id/delete', requireLogin, async (req, res) => {
 
 // User dashboard to view bookings
 app.get('/dashboard', requireLogin, async (req, res) => {
+  // Find all campers that have bookings by current user
   const campers = await Camper.find({ 'bookings.user': req.session.userId }).populate('owner');
   const bookings = [];
   campers.forEach(camper => {
@@ -286,7 +276,8 @@ app.get('/api/campers/:id', async (req, res) => {
   }
   res.json(camper);
 });
- Start server
+
+// Start server
 const port = process.env.PORT || 3000;
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
