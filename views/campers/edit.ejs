@@ -1,2 +1,16 @@
+<!-- Edit camper form page -->
 <h1>Edit Camper</h1>
-<p>The edit functionality is under construction.</p>
+<form action="/campers/<%= camper._id %>" method="POST" enctype="multipart/form-data" class="form">
+  <label for="title">Title</label>
+  <input type="text" name="title" id="title" required value="<%= camper.title %>" />
+  <label for="description">Description</label>
+  <textarea name="description" id="description" rows="5" required><%= camper.description %></textarea>
+  <label for="pricePerDay">Price per day (€)</label>
+  <input type="number" name="pricePerDay" id="pricePerDay" required min="0" step="0.01" value="<%= camper.pricePerDay %>" />
+  <label for="image">Replace image (optional)</label>
+  <input type="file" name="image" id="image" accept="image/*" />
+  <button type="submit" class="button">Update Camper</button>
+</form>
+<form action="/campers/<%= camper._id %>/delete" method="POST" style="margin-top:15px;">
+  <button type="submit" class="button" style="background-color:#e74c3c;">Delete Camper</button>
+</form>
