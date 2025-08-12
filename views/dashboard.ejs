@@ -6,9 +6,7 @@
   <ul class="booking-list">
     <% bookings.forEach(item => { %>
       <li>
-        <strong><%= item.camper.title %></strong>: 
-        <%= new Date(item.startDate).toLocaleDateString() %> – 
-        <%= new Date(item.endDate).toLocaleDateString() %>
+        <strong><%= item.camper.title %></strong>: <%= new Date(item.startDate).toLocaleDateString() %> – <%= new Date(item.endDate).toLocaleDateString() %>
       </li>
     <% }); %>
   </ul>
